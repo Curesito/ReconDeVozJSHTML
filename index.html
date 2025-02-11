@@ -25,9 +25,7 @@
       <option value="es-ES">Español</option>
     </select>
   </p>
-  <p>
-    <h2 id="text">Esperando que hables</h2>
-  </p>
+  <h2 id="text">Esperando que hables</h2>
   <script>
     async function populateMicList(){
       const micSelect = document.getElementById("micSelect");
@@ -48,13 +46,13 @@
     }
     populateMicList();
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(!SpeechRecognition){ alert("Tu navegador no soporta la API de Reconocimiento de Voz."); }
+    if (!SpeechRecognition) { alert("Tu navegador no soporta la API de Reconocimiento de Voz."); }
     const recognition = new SpeechRecognition();
     recognition.lang = document.getElementById("langSelect").value;
-    recognition.continuous = true;
+    recognition.continuous = false;
     recognition.onresult = function(event){
       let transcript = "";
-      for(let i = event.resultIndex; i < event.results.length; i++){
+      for (let i = event.resultIndex; i < event.results.length; i++){
         transcript += event.results[i][0].transcript;
       }
       document.getElementById("text").innerText = transcript;
