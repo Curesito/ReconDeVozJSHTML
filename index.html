@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Reconocimiento de voz Demo</title>
+  <title>Reconocimiento de Voz Demo</title>
   <style>
     body { font-family: sans-serif; margin: 2rem; }
     #micSelect, #langSelect { margin-top: 1rem; }
@@ -16,7 +16,7 @@
   <p>
     <label for="micSelect">Selecciona el Mic:</label>
     <select id="micSelect"></select>
-    <small>(La API agarra por default así que elegí por las dudas)</small>
+    <small>(La API usa el micrófono por defecto)</small>
   </p>
   <p>
     <label for="langSelect">Selecciona el Idioma:</label>
@@ -29,20 +29,16 @@
   <script>
     async function populateMicList(){
       const micSelect = document.getElementById("micSelect");
-      try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const audioInputs = devices.filter(device => device.kind === "audioinput");
-        micSelect.innerHTML = "";
-        audioInputs.forEach((device, index) => {
-          const option = document.createElement("option");
-          option.value = device.deviceId;
-          option.text = device.label || "Microphone " + (index + 1);
-          micSelect.appendChild(option);
-        });
-      } catch(e) {
-        console.error("Error al acceder al micrófono", e);
-      }
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioInputs = devices.filter(device => device.kind === "audioinput");
+      micSelect.innerHTML = "";
+      audioInputs.forEach((device, index) => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.text = device.label || "Microphone " + (index + 1);
+        micSelect.appendChild(option);
+      });
     }
     populateMicList();
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -57,7 +53,7 @@
       }
       document.getElementById("text").innerText = transcript;
     };
-    recognition.onerror = function(event){ console.error("Error: ", event.error); };
+    recognition.onerror = function(event){ console.error(event.error); };
     recognition.onend = function(){
       document.getElementById("startBtn").disabled = false;
       document.getElementById("stopBtn").disabled = true;
