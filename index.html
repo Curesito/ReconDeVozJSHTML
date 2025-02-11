@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Reconocimiento de voz Demo</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2rem;
+    }
+    #micSelect, #langSelect {
+      margin-top: 1rem;
+    }
+    #startBtn, #stopBtn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Clickea para empezar mister master</h1>
+  <button id="startBtn">Empezar</button>
+  <button id="stopBtn" disabled>Detener</button>
+  <p>
+    <label for="micSelect">Selecciona el Mic:</label>
+    <select id="micSelect"></select>
+    <small>(La API agarra por default asi que elegi por las dudas)</small>
+  </p>
+  <p>
+    <label for="langSelect">Selecciona el Idioma:</label>
+    <select id="langSelect">
+      <option value="en-GB">Inglés</option>
+      <option value="es-ES">Español</option>
+    </select>
+  </p>
+  <p>
+    <h2 id="text">Esperando Reconocer</h2>
+  </p>
+  <script>
+    async function populateMicList() {
+      const micSelect = document.getElementById("micSelect");
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioInputs = devices.filter(device => device.kind === "audioinput");
+      micSelect.innerHTML = "";
+      audioInputs.forEach((device, index) => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.text = device.label || "Microphone " + (index + 1);
+        micSelect.appendChild(option);
+      });
+    }
+    populateMicList();
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support the Speech Recognition API.");
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = document.getElementById("langSelect").value;
+    recognition.continuous = true;
+    recognition.onresult = function(event) {
+      let transcript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      document.getElementById("text").innerText = transcript;
+    };
+    recognition.onerror = function(event) {
+      console.error("Error: ", event.error);
+    };
+    recognition.onend = function() {
+      document.getElementById("startBtn").disabled = false;
+      document.getElementById("stopBtn").disabled = true;
+    };
+    document.getElementById("startBtn").addEventListener("click", function() {
+      recognition.lang = document.getElementById("langSelect").value;
+      recognition.start();
+      document.getElementById("startBtn").disabled = true;
+      document.getElementById("stopBtn").disabled = false;
+    });
+    document.getElementById("stopBtn").addEventListener("click", function() {
+      recognition.stop();
+      document.getElementById("startBtn").disabled = false;
+      document.getElementById("stopBtn").disabled = true;
+    });
+  </script>
+</body>
+</html>
