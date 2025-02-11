@@ -10,7 +10,7 @@
   </style>
 </head>
 <body>
-  <h1 id="text">Clickea para empezar mister master</h1>
+  <h1>Clickea para empezar mister master</h1>
   <button id="startBtn">Empezar</button>
   <button id="stopBtn" disabled>Detener</button>
   <p>
@@ -25,19 +25,26 @@
       <option value="es-ES">Español</option>
     </select>
   </p>
+  <p>
+    <h2 id="text">Esperando que hables</h2>
+  </p>
   <script>
     async function populateMicList(){
       const micSelect = document.getElementById("micSelect");
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const audioInputs = devices.filter(device => device.kind === "audioinput");
-      micSelect.innerHTML = "";
-      audioInputs.forEach((device, index) => {
-        const option = document.createElement("option");
-        option.value = device.deviceId;
-        option.text = device.label || "Microphone " + (index + 1);
-        micSelect.appendChild(option);
-      });
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const audioInputs = devices.filter(device => device.kind === "audioinput");
+        micSelect.innerHTML = "";
+        audioInputs.forEach((device, index) => {
+          const option = document.createElement("option");
+          option.value = device.deviceId;
+          option.text = device.label || "Microphone " + (index + 1);
+          micSelect.appendChild(option);
+        });
+      } catch(e) {
+        console.error("Error al acceder al micrófono", e);
+      }
     }
     populateMicList();
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
